@@ -1,0 +1,42 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User{
+  id Int @unique @default(autoincrement())
+  tcVkn Int @unique
+  dealerName String?
+  companyName String 
+  role Role @default(USER)
+  adminID Int? 
+  Data Data[]
+  apikey APIkeys[]
+  isActive Boolean @default(true)
+}
+
+model APIkeys{
+  id Int @unique
+  APIkey String @unique 
+  isActive Boolean @default(true)
+  user User @relation(fields: [userID],references: [id])
+  userID Int
+}
+
+model Data{
+  id Int @unique @default(autoincrement())
+  date DateTime @default(now())
+  alinanKontor Int
+  kullanilanKontor Int
+  kalanKontor Int
+  user User @relation(fields: [userTcVkn],references: [tcVkn])
+  userTcVkn Int
+}
+enum Role {
+  USER
+  ADMIN
+}
