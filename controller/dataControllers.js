@@ -129,7 +129,6 @@ const monthDatas = (listData, year) => {
     let nextKey = Object.keys(groupedData)[keyIndex + 1];
     
     let firstItemOfCurrentKey = groupedData[currentKey][0]; // Mevcut anahtarın ilk elemanı
-    console.log(firstItemOfCurrentKey)
     if (groupedData[nextKey]) {
         groupedData[nextKey].push(firstItemOfCurrentKey);
         
