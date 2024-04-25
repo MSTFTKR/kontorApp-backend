@@ -36,6 +36,7 @@ model Data{
   user User @relation(fields: [userTcVkn],references: [tcVkn])
   userTcVkn Int
 }
+
 enum Role {
   USER
   ADMIN
