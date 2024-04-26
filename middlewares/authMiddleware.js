@@ -11,11 +11,10 @@ const authMiddleware = async (req, res, next) => {
       const admin = await prisma.aPIkeys.findUnique({
         where: {APIkey: apikey},include:{user:true}
       });
-      
       req.user= admin.user
+      
       next()
     } catch (error) {
-      console.error("Veritabanından API anahtarlarını alma hatası:", error);
       res.status(401).json({message:"Invalid Api Key"})
     }
 

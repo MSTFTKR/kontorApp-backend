@@ -29,7 +29,7 @@ model APIkeys{
 
 model Data{
   id Int @unique @default(autoincrement())
-  date DateTime @default(now())
+  date DateTime 
   alinanKontor Int
   kullanilanKontor Int
   kalanKontor Int
