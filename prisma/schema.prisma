@@ -10,6 +10,7 @@ datasource db {
 model User{
   id Int @unique @default(autoincrement())
   tcVkn Int @unique
+  password String?
   dealerName String?
   companyName String 
   role Role @default(USER)

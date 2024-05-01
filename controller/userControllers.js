@@ -1,4 +1,5 @@
 const prisma = require("../DB/prisma");
+const userService=require('../services/userService')
 
 const listAll = async (req, res) => {
   try {
@@ -9,39 +10,17 @@ const listAll = async (req, res) => {
   }
 };
 
-const createUser = async (req, res) => {
-  const { tcVkn, dealerName, companyName, role, adminID } = req.body;
-  if (isNaN(Number(tcVkn)) || !companyName) {
-    return res.status(400).json({ message: "Eksik İstek" });
-  }
+const createUser=async(req,res)=>{
+  const{tcVkn, dealerName, companyName, role, adminID}=req.body
   try {
-    const user = await prisma.user.findUnique({
-      where: { tcVkn: Number(tcVkn) },
-    });
+  const result= await userService.AddUser({tcVkn, dealerName, companyName, role, adminID})
+  res.json( result)
+ } catch (error) {
+    res.status(500).json({message:error.message|| "Internal Server Error"})
     
-    if (user) {
-      return res.status(400).json({ message: "Bu tcVkn zaten mevcut" });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
   }
-  
 
-  try {
-    const newUser = await prisma.user.create({
-      data: {
-        tcVkn: Number(tcVkn),
-        dealerName: dealerName,
-        companyName: companyName,
-        role: role,
-        adminID: Number(adminID),
-      },
-    });
-    res.json(newUser);
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-};
+}
 
 const updateUser = async (req, res) => {
   const { tcVkn } = req.query;
@@ -131,5 +110,8 @@ const deleteUser = async (req, res) => {
     res.status(500).json({ error: "Kullanıcı silinirken bir hata oluştu." });
   }
 };
+
+
+
 
 module.exports = { listAll, createUser, updateUser, deleteUser };

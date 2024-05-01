@@ -1,6 +1,7 @@
 const prisma = require("../DB/prisma");
 const moment = require("moment");
-const analysisComponent =require('../components/analysisComponent')
+const analysisComponent = require("../components/analysisComponent");
+const { rounded } = require("../components/dateComponents");
 
 const listYear = async (req, res) => {
   const { year } = req.params;
@@ -18,11 +19,8 @@ const listYear = async (req, res) => {
         date: "desc", //Tarihe göre büyükten küçüğe sıralama
       },
     });
-    // console.log(yearDatas(listData,year))
-    // console.log(monthDatas(listData, year));
-    // console.log(weekDatas(listData, year));
-    
-    res.json(analysisComponent(listData,year));
+
+    res.json(analysisComponent(listData, year));
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -30,19 +28,74 @@ const listYear = async (req, res) => {
 
 const rangeList = async (req, res) => {
   const { startDate, endDate } = req.query;
+  let sDate = moment(startDate);
+  let eDate = moment(endDate);
+  let convertEndDate = eDate.add(1, "days");
   try {
-    const datas = await prisma.data.findMany({
+    const rangeDatas = await prisma.data.findMany({
       where: {
         date: {
           gte: new Date(startDate), // Başlangıç tarihi
-          lt: new Date(endDate), // Bitiş tarihi
+          lt: new Date(convertEndDate), // Bitiş tarihi
         },
       },
       orderBy: {
         date: "desc", //büyükten küçüğe sıralama
       },
     });
-    res.json(datas);
+
+    let rangeTotalUsage =
+      rangeDatas[0].kullanilanKontor -
+      rangeDatas[rangeDatas.length - 1].kullanilanKontor;
+    let rangeTotalReceived =
+      rangeDatas[0].alinanKontor -
+      rangeDatas[rangeDatas.length - 1].alinanKontor;
+
+    let rangeTotalUsageWeekAvg;
+    let rangeTotalUsageDayAvg;
+    let rangeTotalReceivedWeekAvg;
+    let rangeTotalReceivedDayAvg;
+
+    const daysDiff = eDate.diff(sDate, "days");
+
+    const weekOfrange = daysDiff / 7;
+    rangeTotalUsageWeekAvg = rangeTotalUsage / weekOfrange;
+    rangeTotalUsageDayAvg = rangeTotalUsage / daysDiff;
+    rangeTotalReceivedWeekAvg = rangeTotalReceived / weekOfrange;
+    rangeTotalReceivedDayAvg = rangeTotalReceived / daysDiff;
+
+    const rangesAnalysisData = {
+      rangeTotalReceived: rangeTotalReceived,
+      rangeTotalUsage: rangeTotalUsage,
+      rangeTotalReceivedWeekAvg: rounded(rangeTotalReceivedWeekAvg),
+      rangeTotalReceivedDayAvg: rounded(rangeTotalReceivedDayAvg),
+
+      rangeTotalUsageWeekAvg: rounded(rangeTotalUsageWeekAvg),
+      rangeTotalUsageDayAvg: rounded(rangeTotalUsageDayAvg),
+    };
+
+    const uniqueRangeData = [];
+    const processedDates = new Set();
+
+    // Her gün için sadece bir veri al
+    rangeDatas.forEach((item) => {
+      let dateString = item.date.toISOString();
+      const dateKey = dateString.split("T")[0];
+      if (!processedDates.has(dateKey)) {
+        const newItem = { ...item };
+        uniqueRangeData.push(newItem);
+        processedDates.add(dateKey);
+      }
+    });
+
+    uniqueRangeData.forEach((deletes) => {
+      delete deletes.id;
+      delete deletes.kalanKontor;
+      delete deletes.userTcVkn;
+    });
+    // console.log(uniqueRangeData);
+    res.json({ rangeDatas, rangesAnalysisData,uniqueRangeData });
+    // res.json(rangesData);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -66,20 +119,26 @@ const createData = async (req, res) => {
   today.setSeconds(0);
   today.setMilliseconds(0);
   today.setHours(today.getHours() + 3);
-  
+
   try {
     const lastData = await prisma.data.findFirst({
       orderBy: {
-        date: 'desc'
-      }
+        date: "desc",
+      },
     });
     let existingData;
     if (date) {
-      if(dateTime<lastData.date||alinanKontor<lastData.alinanKontor||kullanilanKontor<lastData.kullanilanKontor){
-        let utcTr=lastData.date
-        utcTr.setHours(utcTr.getHours()-3)
-       throw new Error(`tarih, alinanKontor ve kullanilanKontor alanlarından biri son datadaki veriden daha küçük olamaz.
-       Son Tarih:${utcTr.toString().slice(0,21)},       Son Alınan:${lastData.alinanKontor},        Son Kullanılan:${lastData.kullanilanKontor}`)
+      if (
+        dateTime < lastData.date ||
+        alinanKontor < lastData.alinanKontor ||
+        kullanilanKontor < lastData.kullanilanKontor
+      ) {
+        let utcTr = lastData.date;
+        utcTr.setHours(utcTr.getHours() - 3);
+        throw new Error(`tarih, alinanKontor ve kullanilanKontor alanlarından biri son datadaki veriden daha küçük olamaz.
+       Son Tarih:${utcTr.toString().slice(0, 21)},       Son Alınan:${
+          lastData.alinanKontor
+        },        Son Kullanılan:${lastData.kullanilanKontor}`);
       }
       existingData = await prisma.data.findFirst({
         where: {
@@ -89,11 +148,17 @@ const createData = async (req, res) => {
         },
       });
     } else {
-      if(today<lastData.date||alinanKontor<lastData.alinanKontor||kullanilanKontor<lastData.kullanilanKontor){
-        let utcTr=lastData.date
-        utcTr.setHours(utcTr.getHours()-3)
-       throw new Error(`tarih, alinanKontor ve kullanilanKontor alanlarından biri son datadaki veriden daha küçük olamaz.
-       Son Tarih:${utcTr.toString().slice(0,21)},       Son Alınan:${lastData.alinanKontor},        Son Kullanılan:${lastData.kullanilanKontor}`)
+      if (
+        today < lastData.date ||
+        alinanKontor < lastData.alinanKontor ||
+        kullanilanKontor < lastData.kullanilanKontor
+      ) {
+        let utcTr = lastData.date;
+        utcTr.setHours(utcTr.getHours() - 3);
+        throw new Error(`tarih, alinanKontor ve kullanilanKontor alanlarından biri son datadaki veriden daha küçük olamaz.
+       Son Tarih:${utcTr.toString().slice(0, 21)},       Son Alınan:${
+          lastData.alinanKontor
+        },        Son Kullanılan:${lastData.kullanilanKontor}`);
       }
       existingData = await prisma.data.findFirst({
         where: {
@@ -134,9 +199,6 @@ const createData = async (req, res) => {
   }
 };
 
-
-
-
 const adminCreateData = async (req, res) => {
   const { alinanKontor, kullanilanKontor, kalanKontor, userTcVkn, date } =
     req.body;
@@ -155,9 +217,8 @@ const adminCreateData = async (req, res) => {
   today.setSeconds(0);
   today.setMilliseconds(0);
   today.setHours(today.getHours() + 3);
-  
+
   try {
-    
     let existingData;
     if (date) {
       existingData = await prisma.data.findFirst({
@@ -216,8 +277,7 @@ const updateData = async (req, res) => {
     });
     if (!data) {
       res.json("Not found id");
-    }
-    else{
+    } else {
       try {
         const updateData = await prisma.data.update({
           where: { id: Number(id) },
@@ -225,7 +285,9 @@ const updateData = async (req, res) => {
             alinanKontor:
               alinanKontor !== undefined ? Number(alinanKontor) : undefined,
             kullanilanKontor:
-              kullanilanKontor !== undefined ? Number(kullanilanKontor) : undefined,
+              kullanilanKontor !== undefined
+                ? Number(kullanilanKontor)
+                : undefined,
             kalanKontor:
               kalanKontor !== undefined ? Number(kalanKontor) : undefined,
             userTcVkn: userTcVkn !== undefined ? Number(userTcVkn) : undefined,
@@ -234,8 +296,9 @@ const updateData = async (req, res) => {
         res.json(updateData);
       } catch (error) {
         res.status(500).json({ message: error.message });
+      }
     }
-  }} catch (error) {
+  } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
@@ -259,4 +322,11 @@ const deleteData = async (req, res) => {
   }
 };
 
-module.exports = {createData, updateData, deleteData, listYear, rangeList, adminCreateData};
+module.exports = {
+  createData,
+  updateData,
+  deleteData,
+  listYear,
+  rangeList,
+  adminCreateData,
+};
