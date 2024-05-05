@@ -5,11 +5,15 @@ const { rounded } = require("../components/dateComponents");
 
 const listYear = async (req, res) => {
   const { year } = req.params;
+  let userTcVkn=req.userTcVkn
+  console.log(userTcVkn)
   try {
     const baslangicTarihi = new Date(year, 0, 1);
     const bitisTarihi = new Date(year, 11, 31, 23, 59, 59);
+    
     const listData = await prisma.data.findMany({
       where: {
+        userTcVkn,
         date: {
           gte: baslangicTarihi,
           lte: bitisTarihi,
@@ -31,19 +35,21 @@ const rangeList = async (req, res) => {
   let sDate = moment(startDate);
   let eDate = moment(endDate);
   let convertEndDate = eDate.add(1, "days");
+  let userTcVkn=req.userTcVkn
   try {
     const rangeDatas = await prisma.data.findMany({
       where: {
+        userTcVkn:{equals:userTcVkn},
         date: {
           gte: new Date(startDate), // Başlangıç tarihi
           lt: new Date(convertEndDate), // Bitiş tarihi
         },
       },
       orderBy: {
-        date: "desc", //büyükten küçüğe sıralama
+        date: "desc", //sıralama
       },
     });
-
+  
     let rangeTotalUsage =
       rangeDatas[0].kullanilanKontor -
       rangeDatas[rangeDatas.length - 1].kullanilanKontor;

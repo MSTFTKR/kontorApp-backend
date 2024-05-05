@@ -44,7 +44,7 @@ const login = async (req, res) => {
       expiresIn: "1h",
     });
 
-
+    
     res.json({ token: token, tcVkn: user.tcVkn });
   } catch (error) {
     console.error("Hata:", error);

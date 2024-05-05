@@ -17,7 +17,7 @@ const fonk = async () => {
         },
       }
     );
-    console.log(result.data)
+    // console.log(result.data)
   } catch (error) {
     
   }
