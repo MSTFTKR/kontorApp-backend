@@ -27,7 +27,7 @@ const login = async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: {
-        tcVkn: parseInt(tcVkn),
+        tcVkn: tcVkn,
       },
     });
     console.log(user)

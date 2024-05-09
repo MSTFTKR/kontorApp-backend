@@ -5,7 +5,6 @@ const authMiddleware=require('../middlewares/authMiddleware')
 
 route.get('/listele',authMiddleware, userControllers.listAll);
 route.post('/create',authMiddleware, userControllers.createUser)
-route.post('/create',authMiddleware, userControllers.createUser)
 route.put('/update',authMiddleware, userControllers.updateUser)
 route.delete('/delete',authMiddleware, userControllers.deleteUser)
 

@@ -19,4 +19,5 @@ app.get("*", (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server is running on PORT ${PORT}`));
+const IP_ADRESS=process.env.IP_ADRESS||localhost;
+app.listen(PORT, IP_ADRESS, () => console.log(`Server is running on PORT,${IP_ADRESS} ${PORT}`));

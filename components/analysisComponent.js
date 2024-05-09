@@ -24,8 +24,10 @@ const weekDatas = (listData, year) => {
     weekGroupedData[key].push(entry);
   });
 
+  // console.log(weekGroupedData)
+
   for (
-    //bir önceki keyin anahtarını bir sonrakine ekleme
+    //bir önceki keyin son anahtarını bir sonrakine ekleme
     let keyIndex = 0;
     keyIndex < Object.keys(weekGroupedData).length - 1;
     keyIndex++
@@ -53,17 +55,34 @@ const weekDatas = (listData, year) => {
     let weekTotalUsageDayAvg;
     let weekTotalReceivedDayAvg;
     const today = moment().date();
-    if (
-      week[1] == weekOfMonth(today) &&
-      week[0] == moment().month() + 1 &&
-      year == new Date().getFullYear()
-    ) {
-      let dayOfweek = unfinishedWeek(weekOfMonth(today), today);
-      weekTotalUsageDayAvg = weekTotalUsage / dayOfweek;
-      weekTotalReceivedDayAvg = weekTotalReceived / dayOfweek;
+    if (week.length > 2) {
+      let monthNumber = week[0] + week[1];
+      // console.log(monthNumber)
+      if (
+        week[2] == weekOfMonth(today) &&
+        monthNumber == moment().month() + 1 &&
+        year == new Date().getFullYear()
+      ) {
+        let dayOfweek = unfinishedWeek(weekOfMonth(today), today);
+        weekTotalUsageDayAvg = weekTotalUsage / dayOfweek;
+        weekTotalReceivedDayAvg = weekTotalReceived / dayOfweek;
+      } else {
+        weekTotalUsageDayAvg = weekTotalUsage / 7;
+        weekTotalReceivedDayAvg = weekTotalReceived / 7;
+      }
     } else {
-      weekTotalUsageDayAvg = weekTotalUsage / 7;
-      weekTotalReceivedDayAvg = weekTotalReceived / 7;
+      if (
+        week[1] == weekOfMonth(today) &&
+        week[0] == moment().month() + 1 &&
+        year == new Date().getFullYear()
+      ) {
+        let dayOfweek = unfinishedWeek(weekOfMonth(today), today);
+        weekTotalUsageDayAvg = weekTotalUsage / dayOfweek;
+        weekTotalReceivedDayAvg = weekTotalReceived / dayOfweek;
+      } else {
+        weekTotalUsageDayAvg = weekTotalUsage / 7;
+        weekTotalReceivedDayAvg = weekTotalReceived / 7;
+      }
     }
 
     generateWeeksData = {
@@ -79,39 +98,50 @@ const weekDatas = (listData, year) => {
   }
   // console.log(weekGroupedData)
   let yedek;
-  let yedekKey=0
+  let yedekKey = 0;
   for (const key in weekGroupedData) {
     ///haftaların son verisi Grafik için
     let lastItem;
 
-    if (weekGroupedData.hasOwnProperty(key)) {
-      let convertKey = key[0] + "0";
-    
-     
-      if (convertKey === "10") {
-        lastWeekItemsByKey[convertKey] = weekGroupedData[key][0];
-      }
+    // console.log('------------------')
+      
 
-      if(yedekKey!==key[0]){
-        if (convertKey === "20") {
-          lastWeekItemsByKey[convertKey] = yedek;
-  
-        } else if (convertKey === "30") {
-          lastWeekItemsByKey[convertKey] = yedek;
-  
-        } else if (convertKey === "40") {
-          lastWeekItemsByKey[convertKey] = yedek;
-  
-        }
+    
+      let convertKey;
+      if (key.length > 2) {
+        convertKey = key[0] + key[1] + "0";
+      } else {
+        convertKey = key[0] + "0";
       }
+  
+      
+
+      if(key.length>2){
+        if (yedekKey !== key[0]+key[1]) {
+          lastWeekItemsByKey[convertKey] = yedek;
+      }
+      }else{
+        if (convertKey == "10") {
+          lastWeekItemsByKey[convertKey] = weekGroupedData[key][0];
+        }else if (yedekKey !== key[0]) {
+          lastWeekItemsByKey[convertKey] = yedek;
+      }
+    }
+      
+
       const lastItemIndex = weekGroupedData[key].length - 1;
       lastItem = weekGroupedData[key][lastItemIndex];
       yedek = lastItem;
-   
-      yedekKey=key[0]
+
+      if(key.length>2){
+        yedekKey = key[0]+key[1];
+      }else{
+        yedekKey = key[0];
+      }
+      
       // console.log(yedek)
       lastWeekItemsByKey[key] = lastItem;
-    }
+    
   }
 
   // console.log(lastWeekItemsByKey);
@@ -119,21 +149,20 @@ const weekDatas = (listData, year) => {
 
   let daysOfWeekDatas = JSON.parse(JSON.stringify(weekGroupedData));
 
-
   for (const key in daysOfWeekDatas) {
     if (daysOfWeekDatas.hasOwnProperty(key)) {
       const entries = daysOfWeekDatas[key];
       const uniqueDates = {};
-  
+
       // Tarihi kontrol et
       for (let i = 0; i < entries.length; i++) {
         const entry = entries[i];
-        const date = new Date(entry.date).toISOString().split('T')[0]; // Tarihin sadece gün kısmını al
-  
+        const date = new Date(entry.date).toISOString().split("T")[0]; // Tarihin sadece gün kısmını al
+
         // En son gözlemlenen girdiyi koru
         uniqueDates[date] = entry;
       }
-  
+
       // Yeniden atama
       daysOfWeekDatas[key] = Object.values(uniqueDates);
     }
@@ -149,7 +178,7 @@ const weekDatas = (listData, year) => {
       });
     }
   }
-// console.log(daysOfWeekDatas)
+  // console.log(daysOfWeekDatas)
   return { weeksData, daysOfWeekDatas };
 };
 
@@ -165,7 +194,6 @@ const monthDatas = (listData, year) => {
     monthgroupedData[month].push(entry);
   });
 
-  
   for (
     let keyIndex = 0;
     keyIndex < Object.keys(monthgroupedData).length - 1;

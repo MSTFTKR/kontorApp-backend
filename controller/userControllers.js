@@ -11,9 +11,9 @@ const listAll = async (req, res) => {
 };
 
 const createUser=async(req,res)=>{
-  const{tcVkn, dealerName, companyName, role, adminID}=req.body
+  const{tcVkn, dealerName, companyName, role, adminID,password}=req.body
   try {
-  const result= await userService.AddUser({tcVkn, dealerName, companyName, role, adminID})
+  const result= await userService.AddUser({tcVkn, password, dealerName, companyName, role, adminID})
   res.json( result)
  } catch (error) {
     res.status(500).json({message:error.message|| "Internal Server Error"})
@@ -27,7 +27,7 @@ const updateUser = async (req, res) => {
   const { id, changeTcVkn, dealerName, companyName, role, adminID } = req.body;
   try {
     const user = await prisma.user.findUnique({
-      where: { tcVkn: Number(tcVkn) },
+      where: { tcVkn: tcVkn },
     });
     
     if (!user) {
@@ -39,7 +39,7 @@ const updateUser = async (req, res) => {
   
   try {
     const user = await prisma.user.findUnique({
-      where: { tcVkn: Number(changeTcVkn) },
+      where: { tcVkn: changeTcVkn },
     });
     
     if (user) {
@@ -68,10 +68,10 @@ const updateUser = async (req, res) => {
 
   try {
     const updatedUser = await prisma.user.update({
-      where: { tcVkn: Number(tcVkn) },
+      where: { tcVkn: tcVkn },
       data: {
         id: id!==undefined?Number(id):undefined,
-        tcVkn: changeTcVkn!== undefined? Number(changeTcVkn):undefined,
+        tcVkn: changeTcVkn!== undefined? changeTcVkn:undefined,
         dealerName: dealerName!==undefined?companyName:undefined,
         companyName: companyName!==undefined?companyName:undefined,
         role: role!==undefined?role:undefined,
@@ -90,7 +90,7 @@ const deleteUser = async (req, res) => {
   const { tcVkn } = req.query;
   try {
     const user = await prisma.user.findUnique({
-      where: { tcVkn: Number(tcVkn) },
+      where: { tcVkn: tcVkn },
     });
     
     if (!user) {
@@ -103,7 +103,7 @@ const deleteUser = async (req, res) => {
 
   try {
     const deletedUser = await prisma.user.delete({
-      where: { tcVkn: Number(tcVkn) },
+      where: { tcVkn: tcVkn },
     });
     res.json(deletedUser);
   } catch (error) {

@@ -3,7 +3,7 @@ const prisma = require("../DB/prisma");
 const authMiddleware = async (req, res, next) => {
     try {
       const { apikey } = req.headers;
-    //   console.log(apikey)
+    
 
     if(!apikey){
       return  res.status(401).json({message:"You must provide an ApiKey"})

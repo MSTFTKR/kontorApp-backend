@@ -109,8 +109,7 @@ const rangeList = async (req, res) => {
 
 const createData = async (req, res) => {
   const { alinanKontor, kullanilanKontor, kalanKontor, userTcVkn, date } =
-    req.body;
-
+    req.body.data;
   if (!alinanKontor || !kullanilanKontor || !kalanKontor || !userTcVkn) {
     return res.status(400).json({ message: "Eksik İstek" });
   }
@@ -182,7 +181,7 @@ const createData = async (req, res) => {
           alinanKontor: Number(alinanKontor),
           kullanilanKontor: Number(kullanilanKontor),
           kalanKontor: Number(kalanKontor),
-          userTcVkn: Number(userTcVkn),
+          userTcVkn: userTcVkn,
           date: date ? dateTime : today,
         },
       });
@@ -193,7 +192,7 @@ const createData = async (req, res) => {
           alinanKontor: Number(alinanKontor),
           kullanilanKontor: Number(kullanilanKontor),
           kalanKontor: Number(kalanKontor),
-          userTcVkn: Number(userTcVkn),
+          userTcVkn: userTcVkn,
           date: date ? dateTime : today,
         },
       });
@@ -207,7 +206,7 @@ const createData = async (req, res) => {
 
 const adminCreateData = async (req, res) => {
   const { alinanKontor, kullanilanKontor, kalanKontor, userTcVkn, date } =
-    req.body;
+    req.body.data;
 
   if (!alinanKontor || !kullanilanKontor || !kalanKontor || !userTcVkn) {
     return res.status(400).json({ message: "Eksik İstek" });
@@ -251,10 +250,11 @@ const adminCreateData = async (req, res) => {
           alinanKontor: Number(alinanKontor),
           kullanilanKontor: Number(kullanilanKontor),
           kalanKontor: Number(kalanKontor),
-          userTcVkn: Number(userTcVkn),
-          date: date ? dateTime : today,
+          userTcVkn: userTcVkn,
+          date: date ? dateTime : today
         },
       });
+      
       res.json(updatedData);
     } else {
       const adminCreateData = await prisma.data.create({
@@ -262,7 +262,7 @@ const adminCreateData = async (req, res) => {
           alinanKontor: Number(alinanKontor),
           kullanilanKontor: Number(kullanilanKontor),
           kalanKontor: Number(kalanKontor),
-          userTcVkn: Number(userTcVkn),
+          userTcVkn: userTcVkn,
           date: date ? dateTime : today,
         },
       });
@@ -276,7 +276,7 @@ const adminCreateData = async (req, res) => {
 
 const updateData = async (req, res) => {
   const { id } = req.query;
-  const { alinanKontor, kullanilanKontor, kalanKontor, userTcVkn } = req.body;
+  const { alinanKontor, kullanilanKontor, kalanKontor, userTcVkn } = req.body.data;
   try {
     const data = await prisma.data.findUnique({
       where: { id: Number(id) },
@@ -296,7 +296,7 @@ const updateData = async (req, res) => {
                 : undefined,
             kalanKontor:
               kalanKontor !== undefined ? Number(kalanKontor) : undefined,
-            userTcVkn: userTcVkn !== undefined ? Number(userTcVkn) : undefined,
+            userTcVkn: userTcVkn !== undefined ? userTcVkn : undefined,
           },
         });
         res.json(updateData);

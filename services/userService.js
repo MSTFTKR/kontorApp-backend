@@ -8,7 +8,7 @@ const AddUser = async ({ tcVkn, dealerName, companyName, role, adminID, password
     }
 
       const user = await prisma.user.findUnique({
-        where: { tcVkn: Number(tcVkn) },
+        where: { tcVkn: tcVkn },
       });
       
       if (user) {
@@ -20,7 +20,7 @@ const AddUser = async ({ tcVkn, dealerName, companyName, role, adminID, password
       const cryptedPassword = await bcrypt.hash(password, 10);
       const newUser = await prisma.user.create({
         data: {
-          tcVkn: Number(tcVkn),
+          tcVkn: tcVkn,
           dealerName: dealerName,
           companyName: companyName,
           password:cryptedPassword,
@@ -32,7 +32,7 @@ const AddUser = async ({ tcVkn, dealerName, companyName, role, adminID, password
     }else{
       const newUser = await prisma.user.create({
         data: {
-          tcVkn: Number(tcVkn),
+          tcVkn: tcVkn,
           dealerName: dealerName,
           companyName: companyName,
           role: role,

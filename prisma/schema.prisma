@@ -9,7 +9,7 @@ datasource db {
 }
 model User{
   id Int @unique @default(autoincrement())
-  tcVkn Int @unique
+  tcVkn String @unique
   password String?
   dealerName String?
   companyName String 
@@ -35,7 +35,7 @@ model Data{
   kullanilanKontor Int
   kalanKontor Int
   user User @relation(fields: [userTcVkn],references: [tcVkn])
-  userTcVkn Int
+  userTcVkn String
 }
 
 enum Role {
