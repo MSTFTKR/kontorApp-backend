@@ -19,7 +19,6 @@ const createUser=async(req,res)=>{
     res.status(500).json({message:error.message|| "Internal Server Error"})
     
   }
-
 }
 
 const updateUser = async (req, res) => {
