@@ -26,6 +26,7 @@ const listYear = async (req, res) => {
 
     res.json(analysisComponent(listData, year));
   } catch (error) {
+    console.log(error)
     res.status(500).json({ message: error.message });
   }
 };
@@ -84,10 +85,10 @@ const rangeList = async (req, res) => {
 
     let rangeTotalUsage =
       rangeDatas[0].kullanilanKontor -
-      rangeDatas[rangeDatas.length - 1].kullanilanKontor;
+      rangeDatas[rangeDatas?.length - 1].kullanilanKontor;
     let rangeTotalReceived =
       rangeDatas[0].alinanKontor -
-      rangeDatas[rangeDatas.length - 1].alinanKontor;
+      rangeDatas[rangeDatas?.length - 1].alinanKontor;
 
     let rangeTotalUsageWeekAvg;
     let rangeTotalUsageDayAvg;
@@ -133,7 +134,7 @@ const rangeList = async (req, res) => {
     // });
     // console.log(uniqueRangeData);
 
-    let totalData = rangeDatas.length;
+    let totalData = rangeDatas?.length;
     res.json({ totalData, rangesAnalysisData });
     // res.json(rangesData);
   } catch (error) {

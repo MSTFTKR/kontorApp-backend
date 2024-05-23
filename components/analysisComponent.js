@@ -29,14 +29,14 @@ const weekDatas = (listData, year) => {
   for (
     //bir önceki keyin son anahtarını bir sonrakine ekleme
     let keyIndex = 0;
-    keyIndex < Object.keys(weekGroupedData).length - 1;
+    keyIndex < Object.keys(weekGroupedData)?.length - 1;
     keyIndex++
   ) {
     let currentKey = Object.keys(weekGroupedData)[keyIndex];
     let nextKey = Object.keys(weekGroupedData)[keyIndex + 1];
 
     let lastItemOfCurrentKey =
-      weekGroupedData[currentKey][weekGroupedData[currentKey].length - 1];
+      weekGroupedData[currentKey][weekGroupedData[currentKey]?.length - 1];
     // Mevcut anahtarın son elemanını bir sonraki anahtarın başına ekle
     if (weekGroupedData[nextKey]) {
       weekGroupedData[nextKey].unshift(lastItemOfCurrentKey);
@@ -46,16 +46,16 @@ const weekDatas = (listData, year) => {
   const weeksData = {};
   for (let week in weekGroupedData) {
     let weekTotalUsage =
-      weekGroupedData[week][weekGroupedData[week].length - 1].kullanilanKontor -
+      weekGroupedData[week][weekGroupedData[week]?.length - 1].kullanilanKontor -
       weekGroupedData[week][0].kullanilanKontor;
     let weekTotalReceived =
-      weekGroupedData[week][weekGroupedData[week].length - 1].alinanKontor -
+      weekGroupedData[week][weekGroupedData[week]?.length - 1].alinanKontor -
       weekGroupedData[week][0].alinanKontor;
 
     let weekTotalUsageDayAvg;
     let weekTotalReceivedDayAvg;
     const today = moment().date();
-    if (week.length > 2) {
+    if (week?.length > 2) {
       let monthNumber = week[0] + week[1];
       // console.log(monthNumber)
       if (
@@ -108,7 +108,7 @@ const weekDatas = (listData, year) => {
 
     
       let convertKey;
-      if (key.length > 2) {
+      if (key?.length > 2) {
         convertKey = key[0] + key[1] + "0";
       } else {
         convertKey = key[0] + "0";
@@ -116,7 +116,7 @@ const weekDatas = (listData, year) => {
   
       
 
-      if(key.length>2){
+      if(key?.length>2){
         if (yedekKey !== key[0]+key[1]) {
           lastWeekItemsByKey[convertKey] = yedek;
       }
@@ -129,11 +129,11 @@ const weekDatas = (listData, year) => {
     }
       
 
-      const lastItemIndex = weekGroupedData[key].length - 1;
+      const lastItemIndex = weekGroupedData[key]?.length - 1;
       lastItem = weekGroupedData[key][lastItemIndex];
       yedek = lastItem;
 
-      if(key.length>2){
+      if(key?.length>2){
         yedekKey = key[0]+key[1];
       }else{
         yedekKey = key[0];
@@ -155,7 +155,7 @@ const weekDatas = (listData, year) => {
       const uniqueDates = {};
 
       // Tarihi kontrol et
-      for (let i = 0; i < entries.length; i++) {
+      for (let i = 0; i < entries?.length; i++) {
         const entry = entries[i];
         const date = new Date(entry.date).toISOString().split("T")[0]; // Tarihin sadece gün kısmını al
 
@@ -196,7 +196,7 @@ const monthDatas = (listData, year) => {
 
   for (
     let keyIndex = 0;
-    keyIndex < Object.keys(monthgroupedData).length - 1;
+    keyIndex < Object.keys(monthgroupedData)?.length - 1;
     keyIndex++
   ) {
     let currentKey = Object.keys(monthgroupedData)[keyIndex];
@@ -217,11 +217,11 @@ const monthDatas = (listData, year) => {
   for (let month in monthgroupedData) {
     let monthTotalUsage =
       monthgroupedData[month][0].kullanilanKontor -
-      monthgroupedData[month][monthgroupedData[month].length - 1]
+      monthgroupedData[month][monthgroupedData[month]?.length - 1]
         .kullanilanKontor;
     let monthTotalReceived =
       monthgroupedData[month][0].alinanKontor -
-      monthgroupedData[month][monthgroupedData[month].length - 1].alinanKontor;
+      monthgroupedData[month][monthgroupedData[month]?.length - 1].alinanKontor;
 
     let monthTotalUsageWeekAvg;
     let monthTotalUsageDayAvg;
@@ -263,7 +263,8 @@ const monthDatas = (listData, year) => {
       lastMonthItemsByKey[key] = lastItem;
     }
   }
-  lastMonthItemsByKey[0] = monthgroupedData[1][monthgroupedData[1].length - 1];
+  
+  lastMonthItemsByKey[0] = monthgroupedData[1]?monthgroupedData[1][monthgroupedData[1]?.length - 1]:[];
   // console.log(lastMonthItemsByKey)
   return { monthsData, lastWeekItemsByKey };
 };
@@ -274,9 +275,9 @@ const monthDatas = (listData, year) => {
 const yearDatas = (listData, year) => {
   let yearTotalUsage =
     listData[0].kullanilanKontor -
-    listData[listData.length - 1].kullanilanKontor;
+    listData[listData?.length - 1].kullanilanKontor;
   let yearTotalReceived =
-    listData[0].alinanKontor - listData[listData.length - 1].alinanKontor;
+    listData[0].alinanKontor - listData[listData?.length - 1].alinanKontor;
   let yearCurrentRemaining = listData[0].kalanKontor;
   let yearCurrentUsage = listData[0].kullanilanKontor;
   let yearCurrentReceived = listData[0].alinanKontor;
