@@ -169,7 +169,7 @@ const createData = async (req, res) => {
     let existingData;
     if (date) {
       if (
-        dateTime < lastData.date ||
+        dateTime < lastData?.date ||
         alinanKontor < lastData.alinanKontor ||
         kullanilanKontor < lastData.kullanilanKontor
       ) {
