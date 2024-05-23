@@ -7,7 +7,7 @@ const adminAuthMiddleware = async (req, res, next) => {
     if(!apikey){
       
     }
-    if(apikey==='asDsaMPv2fdfsb4s9r15ki6uil'){
+    if(apikey===process.env.APIKEY){
         next()
     }else{
       return  res.status(401).json({message:"invalid Api Key"})

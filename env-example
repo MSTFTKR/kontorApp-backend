@@ -3,3 +3,4 @@ IP_ADRESS=ipadresi
 JWT_SECRET='jwt_sevret_key_oluştur_rastgele'
 
 DATABASE_URL="postgresql://postgres:123456@localhost:port/tabloadi?schema=public"
+APIKEY=""

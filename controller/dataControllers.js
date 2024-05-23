@@ -144,7 +144,8 @@ const rangeList = async (req, res) => {
 const createData = async (req, res) => {
   const { alinanKontor, kullanilanKontor, kalanKontor, userTcVkn, date } =
     req.body.data;
-  if (!alinanKontor || !kullanilanKontor || !kalanKontor || !userTcVkn) {
+    console.log(req.body.data)
+  if (!alinanKontor || !kullanilanKontor || !kalanKontor || !userTcVkn|| !date) {
     return res.status(400).json({ message: "Eksik İstek" });
   }
   let dateTime;
