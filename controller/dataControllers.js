@@ -170,8 +170,8 @@ const createData = async (req, res) => {
     if (date) {
       if (
         dateTime < lastData?.date ||
-        alinanKontor < lastData.alinanKontor ||
-        kullanilanKontor < lastData.kullanilanKontor
+        alinanKontor < lastData?.alinanKontor ||
+        kullanilanKontor < lastData?.kullanilanKontor
       ) {
         let utcTr = lastData.date;
         utcTr.setHours(utcTr.getHours() - 3);
