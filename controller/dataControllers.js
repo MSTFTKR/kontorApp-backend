@@ -5,12 +5,12 @@ const { rounded } = require("../components/dateComponents");
 
 const listYear = async (req, res) => {
   const { year } = req.params;
-  let userTcVkn=req.userTcVkn
-  console.log(userTcVkn)
+  let userTcVkn = req.userTcVkn;
+  console.log(userTcVkn);
   try {
     const baslangicTarihi = new Date(year, 0, 1);
     const bitisTarihi = new Date(year, 11, 31, 23, 59, 59);
-    
+
     const listData = await prisma.data.findMany({
       where: {
         userTcVkn,
@@ -30,16 +30,48 @@ const listYear = async (req, res) => {
   }
 };
 
+const pageData = async (req, res) => {
+  const { startDate, endDate, page, pageSize } = req.query;
+  let eDate = moment(endDate);
+  let convertEndDate = eDate.add(1, "days");
+  let userTcVkn = req.userTcVkn;
+  let parsePage = parseInt(page);
+  let parseSizePage = parseInt(pageSize);
+
+  try {
+    const rangeD = await prisma.data.findMany({
+      where: {
+        userTcVkn: { equals: userTcVkn },
+        date: {
+          gte: new Date(startDate), // Başlangıç tarihi
+          lt: new Date(convertEndDate), // Bitiş tarihi
+        },
+      },
+      orderBy: {
+        date: "desc", //sıralama
+      },
+      skip: (parsePage - 1) * parseSizePage,
+      take: parseSizePage,
+    });
+    res.json(rangeD);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const rangeList = async (req, res) => {
   const { startDate, endDate } = req.query;
   let sDate = moment(startDate);
   let eDate = moment(endDate);
   let convertEndDate = eDate.add(1, "days");
-  let userTcVkn=req.userTcVkn
+  let userTcVkn = req.userTcVkn;
+  
+
   try {
+
     const rangeDatas = await prisma.data.findMany({
       where: {
-        userTcVkn:{equals:userTcVkn},
+        userTcVkn: { equals: userTcVkn },
         date: {
           gte: new Date(startDate), // Başlangıç tarihi
           lt: new Date(convertEndDate), // Bitiş tarihi
@@ -49,7 +81,7 @@ const rangeList = async (req, res) => {
         date: "desc", //sıralama
       },
     });
-  
+
     let rangeTotalUsage =
       rangeDatas[0].kullanilanKontor -
       rangeDatas[rangeDatas.length - 1].kullanilanKontor;
@@ -80,27 +112,29 @@ const rangeList = async (req, res) => {
       rangeTotalUsageDayAvg: rounded(rangeTotalUsageDayAvg),
     };
 
-    const uniqueRangeData = [];
-    const processedDates = new Set();
+    // const uniqueRangeData = [];
+    // const processedDates = new Set();
 
-    // Her gün için sadece bir veri al
-    rangeDatas.forEach((item) => {
-      let dateString = item.date.toISOString();
-      const dateKey = dateString.split("T")[0];
-      if (!processedDates.has(dateKey)) {
-        const newItem = { ...item };
-        uniqueRangeData.push(newItem);
-        processedDates.add(dateKey);
-      }
-    });
+    // // Her gün için sadece bir veri al
+    // rangeDatas.forEach((item) => {
+    //   let dateString = item.date.toISOString();
+    //   const dateKey = dateString.split("T")[0];
+    //   if (!processedDates.has(dateKey)) {
+    //     const newItem = { ...item };
+    //     uniqueRangeData.push(newItem);
+    //     processedDates.add(dateKey);
+    //   }
+    // });
 
-    uniqueRangeData.forEach((deletes) => {
-      delete deletes.id;
-      delete deletes.kalanKontor;
-      delete deletes.userTcVkn;
-    });
+    // uniqueRangeData.forEach((deletes) => {
+    //   delete deletes.id;
+    //   delete deletes.kalanKontor;
+    //   delete deletes.userTcVkn;
+    // });
     // console.log(uniqueRangeData);
-    res.json({ rangeDatas, rangesAnalysisData,uniqueRangeData });
+
+    let totalData = rangeDatas.length;
+    res.json({ totalData, rangesAnalysisData });
     // res.json(rangesData);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -251,10 +285,10 @@ const adminCreateData = async (req, res) => {
           kullanilanKontor: Number(kullanilanKontor),
           kalanKontor: Number(kalanKontor),
           userTcVkn: userTcVkn,
-          date: date ? dateTime : today
+          date: date ? dateTime : today,
         },
       });
-      
+
       res.json(updatedData);
     } else {
       const adminCreateData = await prisma.data.create({
@@ -276,7 +310,8 @@ const adminCreateData = async (req, res) => {
 
 const updateData = async (req, res) => {
   const { id } = req.query;
-  const { alinanKontor, kullanilanKontor, kalanKontor, userTcVkn } = req.body.data;
+  const { alinanKontor, kullanilanKontor, kalanKontor, userTcVkn } =
+    req.body.data;
   try {
     const data = await prisma.data.findUnique({
       where: { id: Number(id) },
@@ -335,4 +370,5 @@ module.exports = {
   listYear,
   rangeList,
   adminCreateData,
+  pageData
 };
