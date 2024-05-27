@@ -13,7 +13,7 @@ const listYear = async (req, res) => {
 
     const listData = await prisma.data.findMany({
       where: {
-        userTcVkn,
+        userTcVkn: { equals: userTcVkn },
         date: {
           gte: baslangicTarihi,
           lte: bitisTarihi,

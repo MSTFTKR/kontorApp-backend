@@ -264,7 +264,8 @@ const monthDatas = (listData, year) => {
     }
   }
   
-  lastMonthItemsByKey[0] = monthgroupedData[1]?monthgroupedData[1][monthgroupedData[1]?.length - 1]:[];
+  lastMonthItemsByKey[0] = monthgroupedData[1]?
+  monthgroupedData[1][monthgroupedData[1]?.length - 1]:[];
   // console.log(lastMonthItemsByKey)
   return { monthsData, lastWeekItemsByKey };
 };
